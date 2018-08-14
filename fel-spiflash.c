@@ -47,6 +47,11 @@ spi_flash_info_t default_spi_flash_info = {
 	0x0000, 0x6, 0xD8, 64 * 1024, 0x20, 4 * 1024, 0x02, 256, "Unknown"
 };
 
+spi_flash_info_t m25p28_spi_flash_info = {
+	0x2020, 0x6, 0xD8, 256 * 1024, 0xD8, 256 * 1024, 0x02, 256, "Micron ST"
+};
+
+
 /*****************************************************************************/
 
 #define readl(addr)                 fel_readl(dev, (addr))
@@ -358,7 +363,8 @@ void aw_fel_spiflash_write(feldev_handle *dev,
 	void *backup = backup_sram(dev);
 	uint8_t *buf8 = (uint8_t *)buf;
 
-	spi_flash_info_t *flash_info = &default_spi_flash_info; /* FIXME */
+	//spi_flash_info_t *flash_info = &default_spi_flash_info; /* FIXME */
+	spi_flash_info_t *flash_info = &m25p28_spi_flash_info; /* FIXME */
 
 	if ((offset % flash_info->small_erase_size) != 0) {
 		fprintf(stderr, "aw_fel_spiflash_write: 'addr' must be %d bytes aligned\n",
@@ -426,6 +432,9 @@ void aw_fel_spiflash_info(feldev_handle *dev)
 	switch (buf[3]) {
 	case 0xEF:
 		manufacturer = "Winbond";
+		break;
+	case 0x20:
+		manufacturer = "Micron ST";
 		break;
 	default:
 		manufacturer = "Unknown";
